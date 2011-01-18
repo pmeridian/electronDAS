@@ -1,29 +1,46 @@
 #! /usr/bin/env python
-
-
 import sys
 import math
 from array import array
 from ROOT import *
 print "loading FWLite libraries... ",
 from DataFormats.FWLite import Events, Handle
-
 print "done."
 
-def checkElectronId(ele,cut):
+
+def checkFullElectronId(ele,cut):
+    # Requiring the full ElectronId (value of float is 7)
     if cut == "":
         return true
     else:
         if ele.isElectronIDAvailable(cut):
+            #level 7 is used since we want the full id 
             if fabs(ele.electronID(cut)-7)<0.1:
                 return true
             else:
                 return false
         else:
+            #returning false if electronId not calculated
             return false
+
+def checkElectronIdBit(ele,cut,bit):
+    # Check each single bit entering in the final electronId value
+    # Bit 0: ElectronId
+    # Bit 1: Isolation
+    # Bit 2: Conversion Rejection
+    if cut == "":
+        return true
+    else:
+        if ele.isElectronIDAvailable(cut):
+            #bit 0 is used for electronId, bit1 for isolation, bit2 for conversionRejection
+            if int(ele.electronID(cut)) & (1<<(bit)):
+                return true
+            else:
+                return false
+        else:
+            return true
     
 def main():
-
     # if you want to run in batch mode
     ROOT.gROOT.SetBatch()
     # maximum number of events. -1 run over all
@@ -41,6 +58,11 @@ def main():
     prefixCern = 'rfio:/castor/cern.ch/cms'
     prefixLocal = ''
     prefix = prefixLocal
+
+    # Kinamatic cuts used in the analysis
+    ptCut = 20.
+    metCut = 15.
+    mtCut = 30.
 
     # PAT ntuples with electronCollection
     files = [
@@ -60,18 +82,46 @@ def main():
 
     electronIdLevels= [ "","simpleEleId95cIso","simpleEleId80cIso","simpleEleId70cIso" ]
 
+    # ****************************************************************
+    # Booking histograms
+    # ****************************************************************
     histogram = {}
     histogram["nEle"] = TH1F("nEle","nEle", 20, -0.5, 19.5)
 
     for id in electronIdLevels:
-        histogram["ele_pt" + id] = TH1F("ele_pt"+id,"Ele p_{T} [GeV/c]", 50, 0, 300)
-        histogram["ele_scpt" + id] = TH1F("ele_scpt"+id,"Ele p_{T} (from SC) [GeV/c]", 50, 0, 300)
-        histogram["ele_eta" + id] = TH1F("ele_eta"+id,"ele #eta", 50, -2.5, 2.5)
-        histogram["ele_phi"+ id] = TH1F("ele_phi"+id,"ele #phi", 50, -math.pi, math.pi)
-        histogram["met"+ id] = TH1F("met"+id,"MET [GeV/c]", 50, 0. , 100.)
-        histogram["mt"+ id] = TH1F("mt"+id,"Transverse Mass [GeV/c^{2}]", 50, 0. , 200.)
-        histogram["mee"+ id] = TH1F("mee"+id,"Invariant Mass [GeV/c^{2}]", 100, 0. , 200.)
+        # general electron kinematics carachteristics
+        histogram["ele_pt_" + id] = TH1F("ele_pt_"+id,"Ele p_{T} [GeV/c]", 50, 0, 300)
+        histogram["ele_scpt_" + id] = TH1F("ele_scpt_"+id,"Ele p_{T} (from SC) [GeV/c]", 50, 0, 300)
+        histogram["ele_eta_" + id] = TH1F("ele_eta_"+id,"ele #eta", 50, -2.5, 2.5)
+        histogram["ele_phi_"+ id] = TH1F("ele_phi_"+id,"ele #phi", 50, -math.pi, math.pi)
 
+        # W and Z candidates plots
+        histogram["met_"+ id] = TH1F("met_"+id,"MET [GeV/c]", 50, 0. , 100.)
+        histogram["mt_"+ id] = TH1F("mt_"+id,"Transverse Mass [GeV/c^{2}]", 50, 0. , 200.)
+        histogram["mee_"+ id] = TH1F("mee_"+id,"Invariant Mass [GeV/c^{2}]", 100, 0. , 200.)
+
+        #Id variables just after preselection for EB and EE
+        if id == "": 
+            histogram["ele_EB_sigmaIetaIeta"+ id] = TH1F("ele_EB_sigmaIetaIeta"+id,"#sigma_{i#etai#eta} (EB)", 100, 0., 0.03)
+            histogram["ele_EB_HOverE"+ id] = TH1F("ele_EB_HOverE"+id,"H/E (EB)", 100, 0., 0.15)
+            histogram["ele_EB_CombinedIso"+ id] = TH1F("ele_EB_CombinedIso"+id,"CombinedIso (EB)", 100, 0., 0.15)
+            histogram["ele_EB_ExpMissHits"+ id] = TH1F("ele_EB_ExpMissHits"+id,"Exp Miss. Hits (EB)", 10, -0.5, 9.5)
+            histogram["ele_EE_sigmaIetaIeta"+ id] = TH1F("ele_EE_sigmaIetaIeta"+id,"#sigma_{i#etai#eta} (EE)", 100, 0.015, 0.05)
+            histogram["ele_EE_HOverE"+ id] = TH1F("ele_EE_HOverE"+id,"H/E (EE)", 100, 0., 0.15)
+            histogram["ele_EE_CombinedIso"+ id] = TH1F("ele_EE_CombinedIso"+id,"CombinedIso (EE)", 100, 0., 0.15)
+            histogram["ele_EE_ExpMissHits"+ id] = TH1F("ele_EE_ExpMissHits"+id,"Exp Miss. Hits (EE)", 10, -0.5, 9.5)
+
+        # Some N-1 plots for EB and EE
+        if id != "": # not booking them when no selection is applied
+            histogram["ele_EB_sigmaIetaIetaNMinusOne_"+ id] = TH1F("ele_EB_sigmaIetaIetaNMinusOne_"+id,"#sigma_{i#etai#eta} (EB)", 100, 0., 0.03)
+            histogram["ele_EB_HOverENMinusOne_"+ id] = TH1F("ele_EB_HOverENMinusOne_"+id,"H/E (EB)", 100, 0., 0.15)
+            histogram["ele_EB_CombinedIsoNMinusOne_"+ id] = TH1F("ele_EB_CombinedIsoNMinusOne_"+id,"CombinedIso (EB)", 100, 0., 0.15)
+            histogram["ele_EB_ExpMissHitsNMinusOne_"+ id] = TH1F("ele_EB_ExpMissHitsNMinusOne_"+id,"Exp Miss. Hits (EB)", 10, -0.5, 9.5)
+            histogram["ele_EE_sigmaIetaIetaNMinusOne_"+ id] = TH1F("ele_EE_sigmaIetaIetaNMinusOne_"+id,"#sigma_{i#etai#eta} (EE)", 100, 0.015, 0.05)
+            histogram["ele_EE_HOverENMinusOne_"+ id] = TH1F("ele_EE_HOverENMinusOne_"+id,"H/E (EE)", 100, 0., 0.15)
+            histogram["ele_EE_CombinedIsoNMinusOne_"+ id] = TH1F("ele_EE_CombinedIsoNMinusOne_"+id,"CombinedIso (EE)", 100, 0., 0.15)
+            histogram["ele_EE_ExpMissHitsNMinusOne_"+ id] = TH1F("ele_EE_ExpMissHitsNMinusOne_"+id,"Exp Miss. Hits (EE)", 10, -0.5, 9.5)
+        
     for ih in histogram.keys():
         histogram[ih].Sumw2()
         histogram[ih].SetXTitle( histogram[ih].GetTitle() )
@@ -96,37 +146,103 @@ def main():
 
         Nelectrons = electrons.size()
         histogram["nEle"].Fill( Nelectrons )
-        
+
+        # ***********************************************************************************************
+        # first loop on electrons filling kinematic variables and id variables for the leading electron
+        # ***********************************************************************************************
         for electron in electrons:
             for id in electronIdLevels:
-                if checkElectronId(electron,id):
-                    histogram["ele_pt" + id].Fill( electron.pt() )
-                    histogram["ele_scpt" + id].Fill( electron.caloEnergy()/math.cosh(electron.gsfTrack().eta()) )
-                    histogram["ele_eta" + id].Fill( electron.eta() )
-                    histogram["ele_phi" + id].Fill( electron.phi() )
+                if checkFullElectronId(electron,id):
+                    histogram["ele_pt_" + id].Fill( electron.pt() )
+                    histogram["ele_scpt_" + id].Fill( electron.caloEnergy()/math.cosh(electron.gsfTrack().eta()) )
+                    histogram["ele_eta_" + id].Fill( electron.eta() )
+                    histogram["ele_phi_" + id].Fill( electron.phi() )
+
                     if Nelectrons == 1:
-                        #fill also W selection plots (applying 2nd lepton veto without id)
-                        histogram["met" + id].Fill( met[0].pt() )
+                        #fill W selection plots (applying only 2nd lepton veto without id and pt Cut)
+                        elePt=electron.caloEnergy()/math.cosh(electron.gsfTrack().eta())
+                        if elePt<ptCut:
+                            continue
+                        histogram["met_" + id].Fill( met[0].pt() )
                         a = TVector3()
-                        a.SetPtEtaPhi(electron.caloEnergy()/math.cosh(electron.gsfTrack().eta()), 0. ,electron.phi())
+                        a.SetPtEtaPhi(elePt, 0. ,electron.phi())
                         b = TVector3()
                         b.SetPtEtaPhi( met[0].pt(), 0. , met[0].phi())
                         mt = sqrt(2 * a.Mag() * b.Mag() * (1-math.cos(a.Angle(b))) )
-                        histogram["mt" + id].Fill( mt )
+                        histogram["mt_" + id].Fill( mt )
+                        if id == "": #filling some id variables just after preselection for the leading electron
+                            tkIso = electrons[0].dr03TkSumPt();
+                            ecalIsoPed = (max([0.,electrons[0].dr04EcalRecHitSumEt()-1.]) if electrons[0].isEB() else electrons[0].dr04EcalRecHitSumEt());
+                            hcalIso = electrons[0].dr04HcalTowerSumEt();
+                            if (electrons[0].isEB()):
+                                histogram["ele_EB_CombinedIso"].Fill( (tkIso+ecalIsoPed+hcalIso)/electrons[0].pt() )
+                                histogram["ele_EB_sigmaIetaIeta"].Fill( electrons[0].sigmaIetaIeta() )
+                                histogram["ele_EB_HOverE"].Fill( electrons[0].hadronicOverEm() )
+                                histogram["ele_EB_ExpMissHits"].Fill( electrons[0].gsfTrack().trackerExpectedHitsInner().numberOfHits() )
+                            else:
+                                histogram["ele_EE_CombinedIso"].Fill( (tkIso+ecalIsoPed+hcalIso)/electrons[0].pt() )
+                                histogram["ele_EE_sigmaIetaIeta"].Fill( electrons[0].sigmaIetaIeta() )
+                                histogram["ele_EE_HOverE"].Fill( electrons[0].hadronicOverEm() )
+                                histogram["ele_EE_ExpMissHits"].Fill( electrons[0].gsfTrack().trackerExpectedHitsInner().numberOfHits() )
 
+                        
+        # ****************************************************************
+        # fill plots for symmetric Z selection
+        # ****************************************************************
         if Nelectrons>1:
             for id in electronIdLevels:
-                #fill plots for symmetric Z selection
                 for x in range(len(electrons)-1):
                     for y in range(x+1,len(electrons)):
-                        if (checkElectronId(electrons[x],id) and checkElectronId(electrons[y],id)):
+                        elePt1=electrons[x].caloEnergy()/math.cosh(electrons[x].gsfTrack().eta())
+                        elePt2=electrons[y].caloEnergy()/math.cosh(electrons[y].gsfTrack().eta())
+                        if (elePt1<ptCut or elePt2<ptCut): # requiring both electrons above ptCut
+                            continue
+                        if (checkFullElectronId(electrons[x],id) and checkFullElectronId(electrons[y],id) ): # checking id for both electrons
                             v1=TLorentzVector()
                             v2=TLorentzVector()
-                            v1.SetPtEtaPhiM(electrons[x].caloEnergy()/math.cosh(electrons[x].gsfTrack().eta()),electrons[x].eta(),electrons[x].phi(),0.)
-                            v2.SetPtEtaPhiM(electrons[y].caloEnergy()/math.cosh(electrons[y].gsfTrack().eta()),electrons[y].eta(),electrons[y].phi(),0.)
+                            v1.SetPtEtaPhiM(elePt1,electrons[x].eta(),electrons[x].phi(),0.)
+                            v2.SetPtEtaPhiM(elePt2,electrons[y].eta(),electrons[y].phi(),0.)
                             vZ=v1+v2
-                            histogram["mee" + id].Fill( vZ.Mag() )
+                            histogram["mee_" + id].Fill( vZ.Mag() )
+                            
+        # ****************************************************************                            
+        # doing now n-1 plots for some Id variables for W like candidates
+        # ****************************************************************
+        else:
+            elePt=electrons[0].caloEnergy()/math.cosh(electrons[0].gsfTrack().eta())
+            a = TVector3()
+            a.SetPtEtaPhi(electrons[0].caloEnergy()/math.cosh(electrons[0].gsfTrack().eta()), 0. ,electrons[0].phi())
+            b = TVector3()
+            b.SetPtEtaPhi( met[0].pt(), 0. , met[0].phi())
+            mt = sqrt(2 * a.Mag() * b.Mag() * (1-math.cos(a.Angle(b))))
+            if (elePt> ptCut and met[0].pt()> metCut and mt> mtCut): #MET and MT cuts to increase purity of W selection for N-1 plots
+                tkIso = electrons[0].dr03TkSumPt();
+                ecalIsoPed = (max([0.,electrons[0].dr04EcalRecHitSumEt()-1.]) if electrons[0].isEB() else electrons[0].dr04EcalRecHitSumEt());
+                hcalIso = electrons[0].dr04HcalTowerSumEt();
+                for id in range(1,len(electronIdLevels)): #avoid the first level without any selection
+                    #Filling combined isolation N-1 plot
+                    if checkElectronIdBit(electrons[0],electronIdLevels[id],0) and checkElectronIdBit(electrons[0],electronIdLevels[id],2): #requiring only ElectronID and Conv. Rejection
+                        if (electrons[0].isEB()):
+                            histogram["ele_EB_CombinedIsoNMinusOne_"+ electronIdLevels[id]].Fill( (tkIso+ecalIsoPed+hcalIso)/electrons[0].pt() )
+                        else:
+                            histogram["ele_EE_CombinedIsoNMinusOne_"+ electronIdLevels[id]].Fill( (tkIso+ecalIsoPed+hcalIso)/electrons[0].pt() )
 
+                    #Filling SigmaIEtaIeta and HOverE N-1 plots
+                    if checkElectronIdBit(electrons[0],electronIdLevels[id],1) and checkElectronIdBit(electrons[0],electronIdLevels[id],2): #requiring only Isolation and Conv. Rejection
+                        if (electrons[0].isEB()):
+                            histogram["ele_EB_sigmaIetaIetaNMinusOne_"+ electronIdLevels[id]].Fill( electrons[0].sigmaIetaIeta() )
+                            histogram["ele_EB_HOverENMinusOne_"+ electronIdLevels[id]].Fill( electrons[0].hadronicOverEm() )
+                        else:
+                            histogram["ele_EE_sigmaIetaIetaNMinusOne_"+ electronIdLevels[id]].Fill( electrons[0].sigmaIetaIeta() )
+                            histogram["ele_EE_HOverENMinusOne_"+ electronIdLevels[id]].Fill( electrons[0].hadronicOverEm() )
+
+                    #Filling missHits variables N-1 Plots
+                    if checkElectronIdBit(electrons[0],electronIdLevels[id],0) and checkElectronIdBit(electrons[0],electronIdLevels[id],1): #requiring only ElectronId and Isolation
+                        if (electrons[0].isEB()):
+                            histogram["ele_EB_ExpMissHitsNMinusOne_"+ electronIdLevels[id]].Fill( electrons[0].gsfTrack().trackerExpectedHitsInner().numberOfHits() )
+                        else:
+                            histogram["ele_EE_ExpMissHitsNMinusOne_"+ electronIdLevels[id]].Fill( electrons[0].gsfTrack().trackerExpectedHitsInner().numberOfHits() )
+                    
     # close loop over entries    
     outputroot.cd()
 
