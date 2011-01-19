@@ -51,7 +51,7 @@ def main():
     # if you want to run in batch mode
     ROOT.gROOT.SetBatch()
     # maximum number of events. -1 run over all
-    maxNevents = 50000
+    maxNevents = -1
 
     # Operating point
     electronCollection = "electronPATFilter"
@@ -92,7 +92,11 @@ def main():
     
     for afile in files:
         fullpath_files.append( prefix+afile )
-    
+
+    print 'Processing files '
+    for ifile in fullpath_files:
+            print ifile
+            
     events = Events ( fullpath_files )
 
     handleElectron = Handle ("vector<pat::Electron>")
