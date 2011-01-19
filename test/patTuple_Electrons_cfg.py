@@ -127,7 +127,6 @@ process.electronPATFilter = cms.EDFilter(
     # demand offline spike cleaning with the Swiss Cross criterion:
     useSpikeRejection = cms.untracked.bool(False),
     spikeCleaningSwissCrossCut = cms.untracked.double(0.95),
-    # demand geometrically matched to an HLT object 
     # ET Cut in the SC
     ETCut = cms.untracked.double(20.),                                  
     )
@@ -142,8 +141,10 @@ process.p = cms.Path(
 # rename output file
 process.out.fileName = 'electronsPATTuple.root'            ##  (e.g. 'myTuple.root')
 process.out.outputCommands += [
-        'keep *_electronPATFilter_*_*'
+        'keep *_electronPATFilter_*_*',
+        'keep *_gsfElectronCores_*_*' #important needed to dereference up to the core which keep seeds information
         ]
+
 process.out.SelectEvents = cms.untracked.PSet(
     SelectEvents = cms.vstring('p')
     )

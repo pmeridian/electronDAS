@@ -1,15 +1,20 @@
 #! /usr/bin/env python
 import sys
 import math
+import time
 from array import array
 from ROOT import *
 print "loading FWLite libraries... ",
 from DataFormats.FWLite import Events, Handle
 print "done."
 
+def printInfo(i,event):
+    print "processing entry # " + str(i) + " from Run "+ str(event.eventAuxiliary().id().run()) + " lumi "+str(event.eventAuxiliary().id().luminosityBlock()) + " @ " + time.asctime(time.localtime(time.time()))
 
 def checkFullElectronId(ele,cut):
     # Requiring the full ElectronId (value of float is 7)
+#    if not ele.ecalDrivenSeed():
+#        return false
     if cut == "":
         return true
     else:
@@ -28,6 +33,8 @@ def checkElectronIdBit(ele,cut,bit):
     # Bit 0: ElectronId
     # Bit 1: Isolation
     # Bit 2: Conversion Rejection
+#    if not ele.ecalDrivenSeed():
+#        return false
     if cut == "":
         return true
     else:
@@ -44,7 +51,7 @@ def main():
     # if you want to run in batch mode
     ROOT.gROOT.SetBatch()
     # maximum number of events. -1 run over all
-    maxNevents = -1
+    maxNevents = 50000
 
     # Operating point
     electronCollection = "electronPATFilter"
@@ -55,19 +62,30 @@ def main():
     outputroot = TFile( outfilename, "RECREATE")
         
     prefixFnal = 'dcache:/pnfs/cms/WAX/11'
-    prefixCern = 'rfio:/castor/cern.ch/cms'
-    prefixLocal = ''
+    prefixCern = 'rfio:/castor/cern.ch/user/m/meridian/electronDAS'
+    prefixLocal = '/cmsrm/pc24_2/meridian'
+
     prefix = prefixLocal
 
     # Kinamatic cuts used in the analysis
     ptCut = 20.
-    metCut = 15.
-    mtCut = 30.
+    metCut = 20.
+    mtCut = 40.
 
     # PAT ntuples with electronCollection
     files = [
- #       '/cmsrm/pc24_2/meridian/D6B89C71-4B12-E011-8F7D-001A92971B5E.root'
-        'electronsPATTuple.root'
+        "/Electron22DecPAT/electronsPATTuple_1_1_CY7.root",
+        "/Electron22DecPAT/electronsPATTuple_2_1_6aR.root",
+        "/Electron22DecPAT/electronsPATTuple_3_1_Kuc.root",
+        "/Electron22DecPAT/electronsPATTuple_4_1_HCD.root",
+        "/Electron22DecPAT/electronsPATTuple_5_1_Ga9.root",
+        "/Electron22DecPAT/electronsPATTuple_6_1_u6B.root",
+        "/Electron22DecPAT/electronsPATTuple_7_1_3Ax.root",
+        "/Electron22DecPAT/electronsPATTuple_8_1_o8S.root",
+        "/Electron22DecPAT/electronsPATTuple_9_1_XSq.root",
+        "/Electron22DecPAT/electronsPATTuple_10_1_Jbe.root",
+        "/Electron22DecPAT/electronsPATTuple_11_0_cKj.root",
+        "/Electron22DecPAT/electronsPATTuple_12_0_jRu.root"
         ]
     
     fullpath_files = []
@@ -90,8 +108,8 @@ def main():
 
     for id in electronIdLevels:
         # general electron kinematics carachteristics
-        histogram["ele_pt_" + id] = TH1F("ele_pt_"+id,"Ele p_{T} [GeV/c]", 50, 0, 300)
-        histogram["ele_scpt_" + id] = TH1F("ele_scpt_"+id,"Ele p_{T} (from SC) [GeV/c]", 50, 0, 300)
+        histogram["ele_pt_" + id] = TH1F("ele_pt_"+id,"Ele p_{T} [GeV/c]", 50, 0, 150)
+        histogram["ele_scpt_" + id] = TH1F("ele_scpt_"+id,"Ele p_{T} (from SC) [GeV/c]", 50, 0, 150)
         histogram["ele_eta_" + id] = TH1F("ele_eta_"+id,"ele #eta", 50, -2.5, 2.5)
         histogram["ele_phi_"+ id] = TH1F("ele_phi_"+id,"ele #phi", 50, -math.pi, math.pi)
 
@@ -131,8 +149,8 @@ def main():
 
     for event in events:
         i = i + 1
-        if i%100 == 0:
-            print  "processing entry # " + str(i) + " from Run "+ str(event.eventAuxiliary().id().run()) + " lumi "+str(event.eventAuxiliary().id().luminosityBlock())
+        if i%1000 == 0:
+            printInfo(i,event)
 
         # check if maximum number of events was asked
         if maxNevents > 0 and maxNevents == i:
