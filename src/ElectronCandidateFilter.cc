@@ -210,21 +210,24 @@ ElectronCandidateFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetu
    // *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
    if (useSpikeRejection_)  {
-     for (pat::ElectronCollection::iterator iEle=myElectrons.begin();iEle!=myElectrons.end();++iEle)
+
+     edm::Handle<EcalRecHitCollection> recHits;
+     iEvent.getByLabel(ebRecHits_, recHits);
+
+
+     for (pat::ElectronCollection::reverse_iterator iEle=myElectrons.rbegin();iEle!=myElectrons.rend();++iEle)
        {
 	 if (!iEle->isEB())
 	   continue;
-	 edm::Handle<EcalRecHitCollection> recHits;
-	 iEvent.getByLabel(ebRecHits_, recHits);
+
 	 const EcalRecHitCollection *myRecHits = recHits.product();     
 	 const DetId seedId = iEle->superCluster()->seed()->seed();
-
+	
 	 EcalSeverityLevelAlgo severity;
 	 Double_t swissCross = severity.swissCross(seedId, *myRecHits);
-
 	 if (swissCross > spikeCleaningSwissCrossCut_) {
 	   //removing spikes from electron collection
-	   myElectrons.erase(iEle);
+	   myElectrons.erase(--iEle.base());
 	 }
        }
    }
