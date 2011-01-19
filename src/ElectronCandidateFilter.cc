@@ -227,7 +227,7 @@ ElectronCandidateFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetu
 	 Double_t swissCross = severity.swissCross(seedId, *myRecHits);
 	 if (swissCross > spikeCleaningSwissCrossCut_) {
 	   //removing spikes from electron collection
-	   myElectrons.erase(--iEle.base());
+	   myElectrons.erase((iEle+1).base());
 	 }
        }
    }
