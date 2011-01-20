@@ -58,7 +58,8 @@ def main():
     electronCollectionInstance = "filteredPATElectronCandidates"
     metCollection ="patMETsPF"
     
-    outfilename = "electronDistributions_W_MC.root"
+    #change this according to your needs
+    outfilename = "electronDistributions.root"
     outputroot = TFile( outfilename, "RECREATE")
         
     prefixFnal = 'dcache:/pnfs/cms/WAX/11/store/user/meridian/electronDAS'
@@ -94,7 +95,14 @@ def main():
 #        "/WToENu_TuneZ2_7TeV-pythia6_v1/electronsPATTuple_12_1_EO8.root",
 #        "/WToENu_TuneZ2_7TeV-pythia6_v1/electronsPATTuple_13_1_q4l.root",
 #        "/WToENu_TuneZ2_7TeV-pythia6_v1/electronsPATTuple_14_1_1dL.root",
-    
+
+#       MC DYtoEE files
+#        "/DYToEE_M-20_TuneZ2_7TeV-pythia6_v1/electronsPATTuple_11_1_jTy.root",
+#        "/DYToEE_M-20_TuneZ2_7TeV-pythia6_v1/electronsPATTuple_12_1_jeM.root",
+#        "/DYToEE_M-20_TuneZ2_7TeV-pythia6_v1/electronsPATTuple_13_1_zsz.root",
+#        "/DYToEE_M-20_TuneZ2_7TeV-pythia6_v1/electronsPATTuple_17_1_7Yk.root",
+#        "/DYToEE_M-20_TuneZ2_7TeV-pythia6_v1/electronsPATTuple_18_1_m9E.root",
+
         ]
     
     fullpath_files = []
