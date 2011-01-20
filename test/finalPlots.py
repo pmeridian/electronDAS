@@ -9,122 +9,144 @@ import math
 gROOT.SetStyle("Plain")
 gROOT.SetBatch()
 
-inputfile = TFile("electronDistributions.root")
-inputfile.cd()
+inputfiles = {}
+inputfiles["data"] = TFile("electronDistributions.root")
+inputfiles["W_mc"] = TFile("electronDistributions_W_MC.root")
 
 electronIdLevels= [ "","simpleEleId95cIso","simpleEleId80cIso","simpleEleId70cIso" ]
 electronIdLevelsForNMinusOne= [ "simpleEleId70cIso","simpleEleId80cIso","simpleEleId95cIso","" ]
 
+weight = {}
+weight["data"] = 1.
+weight["W_mc"] = 1. #possibity to reweight to match data luminosity
+
 histogram = {}
+histogram_W_MC = {}
 
 canvas = TCanvas("c","c",1)
 
 #Get all histograms
-for id in electronIdLevels:
-    histogram["ele_pt_" + id] = gDirectory.Get("ele_pt_" + id)
-    histogram["ele_scpt_" + id] = gDirectory.Get("ele_scpt_" + id)
-    histogram["ele_eta_" + id] = gDirectory.Get("ele_eta_" + id)
-    histogram["ele_phi_"+ id] = gDirectory.Get("ele_phi_" + id)
-    histogram["met_"+ id] = gDirectory.Get("met_" + id)
-    histogram["mt_"+ id] = gDirectory.Get("mt_" + id)
-    histogram["mee_"+ id] = gDirectory.Get("mee_" + id)
-    for detector in ["EB","EE"]:
-        if id != "":
-            histogram["ele_"+ detector + "_sigmaIetaIetaNMinusOne_"+ id] = gDirectory.Get("ele_"+ detector + "_sigmaIetaIetaNMinusOne_"+id)
-            histogram["ele_"+ detector + "_HOverENMinusOne_"+ id] = gDirectory.Get("ele_"+ detector + "_HOverENMinusOne_"+id)
-            histogram["ele_"+ detector + "_CombinedIsoNMinusOne_"+ id] = gDirectory.Get("ele_"+ detector + "_CombinedIsoNMinusOne_"+id)
-            histogram["ele_"+ detector + "_ExpMissHitsNMinusOne_"+ id] = gDirectory.Get("ele_"+ detector + "_ExpMissHitsNMinusOne_"+id)
-        else:
-            histogram["ele_"+ detector + "_sigmaIetaIeta"] = gDirectory.Get("ele_"+ detector + "_sigmaIetaIeta")
-            histogram["ele_"+ detector + "_HOverE"] = gDirectory.Get("ele_"+ detector + "_HOverE")
-            histogram["ele_"+ detector + "_CombinedIso"] = gDirectory.Get("ele_"+ detector + "_CombinedIso")
-            histogram["ele_"+ detector + "_ExpMissHits"] = gDirectory.Get("ele_"+ detector + "_ExpMissHits")
+for input in inputfiles.keys():
+    inputfiles[input].cd()
+    for id in electronIdLevels:
+        histogram[input,"ele_pt_" + id] = gDirectory.Get("ele_pt_" + id)
+        histogram[input,"ele_scpt_" + id] = gDirectory.Get("ele_scpt_" + id)
+        histogram[input,"ele_eta_" + id] = gDirectory.Get("ele_eta_" + id)
+        histogram[input,"ele_phi_"+ id] = gDirectory.Get("ele_phi_" + id)
+        histogram[input,"met_"+ id] = gDirectory.Get("met_" + id)
+        histogram[input,"mt_"+ id] = gDirectory.Get("mt_" + id)
+        histogram[input,"mee_"+ id] = gDirectory.Get("mee_" + id)
+        for detector in ["EB","EE"]:
+            if id != "":
+                histogram[input,"ele_"+ detector + "_sigmaIetaIetaNMinusOne_"+ id] = gDirectory.Get("ele_"+ detector + "_sigmaIetaIetaNMinusOne_"+id)
+                histogram[input,"ele_"+ detector + "_HOverENMinusOne_"+ id] = gDirectory.Get("ele_"+ detector + "_HOverENMinusOne_"+id)
+                histogram[input,"ele_"+ detector + "_CombinedIsoNMinusOne_"+ id] = gDirectory.Get("ele_"+ detector + "_CombinedIsoNMinusOne_"+id)
+                histogram[input,"ele_"+ detector + "_ExpMissHitsNMinusOne_"+ id] = gDirectory.Get("ele_"+ detector + "_ExpMissHitsNMinusOne_"+id)
+            else:
+                histogram[input,"ele_"+ detector + "_sigmaIetaIeta"] = gDirectory.Get("ele_"+ detector + "_sigmaIetaIeta")
+                histogram[input,"ele_"+ detector + "_HOverE"] = gDirectory.Get("ele_"+ detector + "_HOverE")
+                histogram[input,"ele_"+ detector + "_CombinedIso"] = gDirectory.Get("ele_"+ detector + "_CombinedIso")
+                histogram[input,"ele_"+ detector + "_ExpMissHits"] = gDirectory.Get("ele_"+ detector + "_ExpMissHits")
 
 os.system("mkdir -p plots")
 
-for key in ["ele_pt","ele_scpt","ele_eta","ele_phi","met","mt","mee"]:
-    print "Drawing " + key
-    icolor=1
-    for id in electronIdLevels:
-        canvas.SetLogy(0)
-        if key == "ele_pt":
-            histogram[key + "_" + id].GetXaxis().SetRangeUser(0.,80.)
-        histogram[key + "_" + id].SetMinimum(0.)
-        histogram[key + "_" + id].SetMarkerStyle(20)
-        histogram[key + "_" + id].SetMarkerSize(1.)
-        histogram[key + "_" + id].SetMarkerColor(icolor)
-#        histogram[key + "_" + id].SetLineWidth()
-        histogram[key + "_" + id].SetLineColor(icolor)
-        if id == "":
-            histogram[key + "_" + id].Draw("E")
-        else:
-            histogram[key + "_" + id].Draw("ESAME")
-        icolor=icolor+1
-    canvas.SaveAs("plots/"+ key + ".png")
+# *----*----*----*----*----*----*----*----*----*----*----*----*----*----*----*----*----*----*----*----*----* 
+# Plotting kinematic distributions for increasing tightness of electronId (linear and log) for data and MC
+# *----*----*----*----*----*----*----*----*----*----*----*----*----*----*----*----*----*----*----*----*----*
+for input in inputfiles.keys():
+    print "++++++++++++++++++ " + input + " ++++++++++++++++++++" 
+    for key in ["ele_pt","ele_scpt","ele_eta","ele_phi","met","mt","mee"]:
+        print "Drawing " + key
+        icolor=1
+        for id in electronIdLevels:
+            canvas.SetLogy(0)
+            if key == "ele_pt":
+                histogram[input,key + "_" + id].GetXaxis().SetRangeUser(0.,80.)
+                
+            histogram[input,key + "_" + id].Scale(weight[input])
+            histogram[input,key + "_" + id].SetMarkerStyle(20)
+            histogram[input,key + "_" + id].SetMarkerSize(1.)
+            histogram[input,key + "_" + id].SetMarkerColor(icolor)
+            #        histogram[input,key + "_" + id].SetLineWidth()
+            histogram[input,key + "_" + id].SetLineColor(icolor)
+            if id == "":
+                histogram[input,key + "_" + id].SetMinimum(0.)
+                histogram[input,key + "_" + id].Draw("E")
+            else:
+                histogram[input,key + "_" + id].Draw("ESAME")
+            icolor=icolor+1
+            canvas.Update()            
+        canvas.SaveAs("plots/"+ key + "_"+ input + ".png")
+            
+        # Plotting also in Logarithmic scale
+        icolor=1
+        for id in electronIdLevels:
+            if key == "ele_pt":
+                histogram[input,key + "_" + id].GetXaxis().SetRangeUser(0.,80.)
+            histogram[input,key + "_" + id].SetMinimum(0.1)
+            histogram[input,key + "_" + id].SetMaximum(histogram[input,key + "_" + id].GetMaximum()*10.)
+            canvas.SetLogy(1)
+            if id == "":
+                histogram[input,key + "_" + id].Draw("E")
+            else:
+                histogram[input,key + "_" + id].Draw("ESAME")
+            icolor = icolor + 1
+        canvas.SaveAs("plots/"+ key + "_"+ input + "_log.png")
 
-    # Plotting also in Logarithmic scale
-    icolor=1
-    for id in electronIdLevels:
-        if key == "ele_pt":
-            histogram[key + "_" + id].GetXaxis().SetRangeUser(0.,80.)
-        histogram[key + "_" + id].SetMinimum(0.1)
-        histogram[key + "_" + id].SetMaximum(histogram[key + "_" + id].GetMaximum()*10.)
-        canvas.SetLogy(1)
-        if id == "":
-            histogram[key + "_" + id].Draw("E")
-        else:
-            histogram[key + "_" + id].Draw("ESAME")
-        icolor = icolor + 1
-    canvas.SaveAs("plots/"+ key + "_log.png")
-
+# *----*----*----*----*----*----*----*----*----*----*----*----*----*----*----*----*----*----*----*
+# Now plotting also N-1 plot (linear and log) for data 
+# *----*----*----*----*----*----*----*----*----*----*----*----*----*----*----*----*----*----*----*
+print "++++++++++++++++++ Now doing N-1 plots ++++++++++++++++++++" 
 for key in ["sigmaIetaIeta","HOverE","CombinedIso","ExpMissHits"]:
     print "Drawing " + key
     for detector in ["EB","EE"]:
-        icolor=4
-        for id in electronIdLevelsForNMinusOne:
-            canvas.SetLogy(0)
+        for input in inputfiles.keys():
+            icolor=4
+            for id in electronIdLevelsForNMinusOne:
+                canvas.SetLogy(0)
 
-            if id != "":
-                histoKey="ele_"+ detector + "_"+ key + "NMinusOne_"+ id
-            else:
-                histoKey="ele_"+ detector + "_"+ key
+                if id != "":
+                    histoKey="ele_"+ detector + "_"+ key + "NMinusOne_"+ id
+                else:
+                    histoKey="ele_"+ detector + "_"+ key
                 
-            histogram[histoKey].SetMinimum(0.)
-            histogram[histoKey].SetMarkerStyle(20)
-            histogram[histoKey].SetMarkerSize(1.)
-            histogram[histoKey].SetMarkerColor(icolor)
-            #        histogram[histoKey].SetLineWidth()
-            histogram[histoKey].SetLineColor(icolor)
-            if id == "simpleEleId70cIso":
-                histogram[histoKey].DrawNormalized("E")
-            else:
-                histogram[histoKey].DrawNormalized("ESAME")
-            icolor=icolor-1
-        canvas.SaveAs("plots/"+ key + "_" + detector + ".png")
+                histogram[input,histoKey].SetMinimum(0.)
+                histogram[input,histoKey].SetMarkerStyle(20)
+                histogram[input,histoKey].SetMarkerSize(1.)
+                histogram[input,histoKey].SetMarkerColor(icolor)
+                #        histogram[input,histoKey].SetLineWidth()
+                histogram[input,histoKey].SetLineColor(icolor)
+                if id == "simpleEleId70cIso":
+                    histogram[input,histoKey].DrawNormalized("E")
+                else:
+                    histogram[input,histoKey].DrawNormalized("ESAME")
+                icolor=icolor-1
+            canvas.SaveAs("plots/"+ key + "_" + detector + "_" + input+".png")
 
-        icolor=4
-        for id in electronIdLevelsForNMinusOne:
-            canvas.SetLogy(1)
+        for input in inputfiles.keys():
+            icolor=4
+            for id in electronIdLevelsForNMinusOne:
+                canvas.SetLogy(1)
 
-            if id != "":
-                histoKey="ele_"+ detector + "_"+ key + "NMinusOne_"+ id
-            else:
-                histoKey="ele_"+ detector + "_"+ key
+                if id != "":
+                    histoKey="ele_"+ detector + "_"+ key + "NMinusOne_"+ id
+                else:
+                    histoKey="ele_"+ detector + "_"+ key
                 
 
-            histogram[histoKey].SetMarkerStyle(20)
-            histogram[histoKey].SetMarkerSize(1.)
-            histogram[histoKey].SetMarkerColor(icolor)
-            #        histogram[histoKey].SetLineWidth()
-            histogram[histoKey].SetLineColor(icolor)
-            if id == "simpleEleId70cIso":
-                histogram[histoKey].DrawNormalized("E")
-            else:
-                histogram[histoKey].DrawNormalized("ESAME")
-            histogram[histoKey].SetMinimum(0.00001)
-            histogram[histoKey].SetMaximum(histogram[histoKey].GetMaximum()*10.)
-            canvas.Update()
-            icolor=icolor-1
-        canvas.SaveAs("plots/"+ key + "_" + detector + "_log.png")
+                histogram[input,histoKey].SetMarkerStyle(20)
+                histogram[input,histoKey].SetMarkerSize(1.)
+                histogram[input,histoKey].SetMarkerColor(icolor)
+                #        histogram[input,histoKey].SetLineWidth()
+                histogram[input,histoKey].SetLineColor(icolor)
+                if id == "simpleEleId70cIso" :
+                    histogram[input,histoKey].DrawNormalized("E")
+                else:
+                    histogram[input,histoKey].DrawNormalized("ESAME")
+                histogram[input,histoKey].SetMinimum(0.00001)
+                histogram[input,histoKey].SetMaximum(histogram[input,histoKey].GetMaximum()*10.)
+                canvas.Update()
+                icolor=icolor-1
+            canvas.SaveAs("plots/"+ key + "_" + detector + "_" + input+"_log.png")
 
             
