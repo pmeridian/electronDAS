@@ -61,7 +61,7 @@ def main():
     outfilename = "electronDistributions_W_MC.root"
     outputroot = TFile( outfilename, "RECREATE")
         
-    prefixFnal = 'dcache:/pnfs/cms/WAX/11'
+    prefixFnal = 'dcache:/pnfs/cms/WAX/11/store/user/meridian/electronDAS'
     prefixCern = 'rfio:/castor/cern.ch/user/m/meridian/electronDAS'
     prefixLocal = '/cmsrm/pc24_2/meridian'
 
@@ -75,25 +75,25 @@ def main():
     # PAT ntuples with electronCollection
     files = [
         # DATA Run 148862-148864  
-#        "/Electron22DecPAT/electronsPATTuple_1_1_CY7.root",
-#        "/Electron22DecPAT/electronsPATTuple_2_1_6aR.root",
-#        "/Electron22DecPAT/electronsPATTuple_3_1_Kuc.root",
-#        "/Electron22DecPAT/electronsPATTuple_4_1_HCD.root",
-#        "/Electron22DecPAT/electronsPATTuple_5_1_Ga9.root",
-#        "/Electron22DecPAT/electronsPATTuple_6_1_u6B.root",
-#        "/Electron22DecPAT/electronsPATTuple_7_1_3Ax.root",
-#        "/Electron22DecPAT/electronsPATTuple_8_1_o8S.root",
-#        "/Electron22DecPAT/electronsPATTuple_9_1_XSq.root",
-#        "/Electron22DecPAT/electronsPATTuple_10_1_Jbe.root",
-#        "/Electron22DecPAT/electronsPATTuple_11_0_cKj.root",
-#        "/Electron22DecPAT/electronsPATTuple_12_0_jRu.root"
+        "/Electron22DecPAT/electronsPATTuple_1_1_CY7.root",
+        "/Electron22DecPAT/electronsPATTuple_2_1_6aR.root",
+        "/Electron22DecPAT/electronsPATTuple_3_1_Kuc.root",
+        "/Electron22DecPAT/electronsPATTuple_4_1_HCD.root",
+        "/Electron22DecPAT/electronsPATTuple_5_1_Ga9.root",
+        "/Electron22DecPAT/electronsPATTuple_6_1_u6B.root",
+        "/Electron22DecPAT/electronsPATTuple_7_1_3Ax.root",
+        "/Electron22DecPAT/electronsPATTuple_8_1_o8S.root",
+        "/Electron22DecPAT/electronsPATTuple_9_1_XSq.root",
+        "/Electron22DecPAT/electronsPATTuple_10_1_Jbe.root",
+        "/Electron22DecPAT/electronsPATTuple_11_0_cKj.root",
+        "/Electron22DecPAT/electronsPATTuple_12_0_jRu.root"
 
 #        MC WEnu files 
-        "/WToENu_TuneZ2_7TeV-pythia6_v1/electronsPATTuple_10_1_Ldq.root",
-        "/WToENu_TuneZ2_7TeV-pythia6_v1/electronsPATTuple_11_1_uBy.root",
-        "/WToENu_TuneZ2_7TeV-pythia6_v1/electronsPATTuple_12_1_EO8.root",
-        "/WToENu_TuneZ2_7TeV-pythia6_v1/electronsPATTuple_13_1_q4l.root",
-        "/WToENu_TuneZ2_7TeV-pythia6_v1/electronsPATTuple_14_1_1dL.root",
+#        "/WToENu_TuneZ2_7TeV-pythia6_v1/electronsPATTuple_10_1_Ldq.root",
+#        "/WToENu_TuneZ2_7TeV-pythia6_v1/electronsPATTuple_11_1_uBy.root",
+#        "/WToENu_TuneZ2_7TeV-pythia6_v1/electronsPATTuple_12_1_EO8.root",
+#        "/WToENu_TuneZ2_7TeV-pythia6_v1/electronsPATTuple_13_1_q4l.root",
+#        "/WToENu_TuneZ2_7TeV-pythia6_v1/electronsPATTuple_14_1_1dL.root",
     
         ]
     
