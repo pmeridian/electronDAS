@@ -57,7 +57,8 @@ process.patElectronIDs = cms.Sequence(process.simpleEleIdSequence)
 
 # switch on PAT trigger for trigger matching and embedding
 from PhysicsTools.PatAlgos.tools.trigTools import *
-switchOnTrigger( process )
+#REDIGI39X for 39X MC
+switchOnTrigger( process , 'patTrigger', 'patTriggerEvent', 'patDefaultSequence', 'REDIGI39X' )
 process.patTrigger.addL1Algos = cms.bool( True )
 
 # adding trigger matching
@@ -71,7 +72,7 @@ process.electronTriggerMatchHLT = cms.EDProducer(
 , filterIds                  = cms.vint32( 0 )    # wildcard, overlaps with 'filterIdsEnum'
 , filterLabels               = cms.vstring( '*' ) # wildcard
 , pathNames                  = cms.vstring(
-    'HLT_Ele17_SW_TighterEleIdIsol_L1R_v2'
+    'HLT_Ele17_SW_TighterEleIdIsol_L1R_v3'
   )
 , pathLastFilterAcceptedOnly = cms.bool( True )   # select only trigger objects used in last filters of succeeding paths
 , collectionTags             = cms.vstring( '*' ) # wildcard
@@ -101,7 +102,7 @@ readFiles = cms.untracked.vstring()
 secFiles = cms.untracked.vstring()
 
 readFiles.extend( [
-    'file:///cmsrm/pc24_2/meridian/D6B89C71-4B12-E011-8F7D-001A92971B5E.root'
+    'file:///cmsrm/pc24_2/meridian/WEnu_Winter10_AODSIM.root'
     ] );
 process.source.fileNames = readFiles
 
@@ -114,7 +115,7 @@ process.electronPATFilter = cms.EDFilter(
     ### the input collections needed:
     electronCollection = cms.untracked.InputTag("selectedPatElectronsTriggerMatch","","PAT"),
     triggerEvent = cms.untracked.InputTag("patTriggerEvent","","PAT"),
-    hltpath = cms.untracked.string("HLT_Ele17_SW_TighterEleIdIsol_L1R_v2"), 
+    hltpath = cms.untracked.string("HLT_Ele17_SW_TighterEleIdIsol_L1R_v3"), 
     ebRecHits = cms.untracked.InputTag("reducedEcalRecHitsEB"),
     eeRecHits = cms.untracked.InputTag("reducedEcalRecHitsEE"),
     ### here the preselection is applied
@@ -125,7 +126,7 @@ process.electronPATFilter = cms.EDFilter(
     # demand ecal driven electron:
     useEcalDrivenElectrons = cms.untracked.bool(True),
     # demand offline spike cleaning with the Swiss Cross criterion. Not needed for 39X
-    useSpikeRejection = cms.untracked.bool(True),
+    useSpikeRejection = cms.untracked.bool(False),
     spikeCleaningSwissCrossCut = cms.untracked.double(0.95),
     # ET Cut in the SC
     ETCut = cms.untracked.double(20.),                                  
@@ -153,7 +154,7 @@ process.out.SelectEvents = cms.untracked.PSet(
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1000)
 
 # process all the events
-process.maxEvents.input = -1
+process.maxEvents.input = 1000
 process.options.wantSummary = True
 
 

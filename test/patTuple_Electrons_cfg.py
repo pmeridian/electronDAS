@@ -125,7 +125,7 @@ process.electronPATFilter = cms.EDFilter(
     # demand ecal driven electron:
     useEcalDrivenElectrons = cms.untracked.bool(True),
     # demand offline spike cleaning with the Swiss Cross criterion:
-    useSpikeRejection = cms.untracked.bool(True),
+    useSpikeRejection = cms.untracked.bool(False),
     spikeCleaningSwissCrossCut = cms.untracked.double(0.95),
     # ET Cut in the SC
     ETCut = cms.untracked.double(20.),                                  
