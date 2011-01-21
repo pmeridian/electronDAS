@@ -13,8 +13,8 @@ def printInfo(i,event):
 
 def checkFullElectronId(ele,cut):
     # Requiring the full ElectronId (value of float is 7)
-#    if not ele.ecalDrivenSeed():
-#        return false
+    if not ele.ecalDrivenSeed():
+        return false
     if cut == "":
         return true
     else:
@@ -33,8 +33,8 @@ def checkElectronIdBit(ele,cut,bit):
     # Bit 0: ElectronId
     # Bit 1: Isolation
     # Bit 2: Conversion Rejection
-#    if not ele.ecalDrivenSeed():
-#        return false
+    if not ele.ecalDrivenSeed():
+        return false
     if cut == "":
         return true
     else:
@@ -76,19 +76,18 @@ def main():
     # PAT ntuples with electronCollection
     files = [
         # DATA Run 148862-148864  
-        "/Electron22DecPAT/electronsPATTuple_1_1_CY7.root",
-        "/Electron22DecPAT/electronsPATTuple_2_1_6aR.root",
-        "/Electron22DecPAT/electronsPATTuple_3_1_Kuc.root",
-        "/Electron22DecPAT/electronsPATTuple_4_1_HCD.root",
-        "/Electron22DecPAT/electronsPATTuple_5_1_Ga9.root",
-        "/Electron22DecPAT/electronsPATTuple_6_1_u6B.root",
-        "/Electron22DecPAT/electronsPATTuple_7_1_3Ax.root",
-        "/Electron22DecPAT/electronsPATTuple_8_1_o8S.root",
-        "/Electron22DecPAT/electronsPATTuple_9_1_XSq.root",
-        "/Electron22DecPAT/electronsPATTuple_10_1_Jbe.root",
-        "/Electron22DecPAT/electronsPATTuple_11_0_cKj.root",
-        "/Electron22DecPAT/electronsPATTuple_12_0_jRu.root"
-
+        "/Electron22DecPAT_v2/electronsPATTuple_10_1_WKk.root",
+        "/Electron22DecPAT_v2/electronsPATTuple_11_1_Adi.root",
+        "/Electron22DecPAT_v2/electronsPATTuple_1_1_dxA.root",
+        "/Electron22DecPAT_v2/electronsPATTuple_2_1_xPq.root",
+        "/Electron22DecPAT_v2/electronsPATTuple_3_2_rFq.root",
+        "/Electron22DecPAT_v2/electronsPATTuple_4_1_7JY.root",
+        "/Electron22DecPAT_v2/electronsPATTuple_5_1_c5t.root",
+        "/Electron22DecPAT_v2/electronsPATTuple_6_1_3Rb.root",
+        "/Electron22DecPAT_v2/electronsPATTuple_7_1_1no.root",
+        "/Electron22DecPAT_v2/electronsPATTuple_8_1_gSK.root",
+        "/Electron22DecPAT_v2/electronsPATTuple_9_1_j0U.root",
+    
 #        MC WEnu files 
 #        "/WToENu_TuneZ2_7TeV-pythia6_v1/electronsPATTuple_10_1_Ldq.root",
 #        "/WToENu_TuneZ2_7TeV-pythia6_v1/electronsPATTuple_11_1_uBy.root",
