@@ -71,7 +71,7 @@ process.electronTriggerMatchHLT = cms.EDProducer(
 , filterIds                  = cms.vint32( 0 )    # wildcard, overlaps with 'filterIdsEnum'
 , filterLabels               = cms.vstring( '*' ) # wildcard
 , pathNames                  = cms.vstring(
-    'HLT_Ele17_SW_TighterEleIdIsol_L1R_v2'
+    'HLT Ele17 SW CaloEleId L1R','HLT Ele17 SW TightEleId L1R','HLT_Ele17_SW_TighterEleIdIsol_L1R_v2','HLT_Ele17_SW_TighterEleIdIsol_L1R_v3'
   )
 , pathLastFilterAcceptedOnly = cms.bool( True )   # select only trigger objects used in last filters of succeeding paths
 , collectionTags             = cms.vstring( '*' ) # wildcard
@@ -101,7 +101,8 @@ readFiles = cms.untracked.vstring()
 secFiles = cms.untracked.vstring()
 
 readFiles.extend( [
-    'file:///cmsrm/pc24_2/meridian/D6B89C71-4B12-E011-8F7D-001A92971B5E.root'
+#    'file:///cmsrm/pc24_2/meridian/D6B89C71-4B12-E011-8F7D-001A92971B5E.root'
+        '/store/data/Run2010B/Electron/AOD/Dec22ReReco_v1/0012/2C47FA85-DA0E-E011-B53A-003048D3FC94.root'
     ] );
 process.source.fileNames = readFiles
 
@@ -114,7 +115,9 @@ process.electronPATFilter = cms.EDFilter(
     ### the input collections needed:
     electronCollection = cms.untracked.InputTag("selectedPatElectronsTriggerMatch","","PAT"),
     triggerEvent = cms.untracked.InputTag("patTriggerEvent","","PAT"),
-    hltpath = cms.untracked.string("HLT_Ele17_SW_TighterEleIdIsol_L1R_v2"), 
+    hltpath = cms.untracked.vstring(
+       'HLT Ele17 SW CaloEleId L1R','HLT Ele17 SW TightEleId L1R','HLT_Ele17_SW_TighterEleIdIsol_L1R_v2','HLT_Ele17_SW_TighterEleIdIsol_L1R_v3'
+       ), 
     ebRecHits = cms.untracked.InputTag("reducedEcalRecHitsEB"),
     eeRecHits = cms.untracked.InputTag("reducedEcalRecHitsEE"),
     ### here the preselection is applied
@@ -153,7 +156,7 @@ process.out.SelectEvents = cms.untracked.PSet(
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1000)
 
 # process all the events
-process.maxEvents.input = -1
+process.maxEvents.input = 1000
 process.options.wantSummary = True
 
 

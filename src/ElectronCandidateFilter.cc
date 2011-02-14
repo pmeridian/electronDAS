@@ -68,7 +68,7 @@ private:
   Double_t ETCut_;
 
   edm::InputTag triggerEvent_;
-  std::string hltpath_;
+  std::vector<std::string> hltpath_;
 
   edm::InputTag electronCollection_;
 
@@ -109,7 +109,7 @@ ElectronCandidateFilter::ElectronCandidateFilter(const edm::ParameterSet& iConfi
   EndCapMinEta_ = iConfig.getUntrackedParameter<double>("EndCapMinEta", EndCapMinEta_D);
   // trigger related
   triggerEvent_=iConfig.getUntrackedParameter<edm::InputTag>("triggerEvent");
-  hltpath_=iConfig.getUntrackedParameter<std::string>("hltpath");
+  hltpath_=iConfig.getUntrackedParameter<std::vector<std::string> >("hltpath");
 
   electronCollection_=iConfig.getUntrackedParameter<edm::InputTag>("electronCollection");
   //
@@ -124,7 +124,7 @@ ElectronCandidateFilter::ElectronCandidateFilter(const edm::ParameterSet& iConfi
 
   // now print a summary with what exactly the filter does:
   std::cout << "ElectronCandidateFilter..." << std::endl;
-  std::cout << "ElectronCandidateFilter: HLT Path   " << hltpath_ << std::endl;
+  //  std::cout << "ElectronCandidateFilter: HLT Path   " << hltpath_ << std::endl;
   std::cout << "ElectronCandidateFilter: ET  > " << ETCut_ << std::endl;
 
   if (useEcalDrivenElectrons_) {
@@ -178,9 +178,14 @@ ElectronCandidateFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetu
    iEvent.getByLabel( triggerEvent_, triggerEvent );
 
    // ask for trigger accept; otherwise we don't even start
-   if(!(triggerEvent->path(hltpath_)->wasRun() && triggerEvent->path(hltpath_)->wasAccept())){
+   bool trigger=false;
+   for (std::vector<std::string>::const_iterator hltpath=hltpath_.begin();hltpath!=hltpath_.end();++hltpath)
+     if((triggerEvent->path(*hltpath)))
+	if((triggerEvent->path(*hltpath)->wasRun() && triggerEvent->path(*hltpath)->wasAccept())){
+	  trigger=true;
+	}
+   if (!trigger)
      return false;
-   }
 
    // *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
    // Electron collection
@@ -257,8 +262,12 @@ ElectronCandidateFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetu
    // *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
    // Demand also that leading electron is trigger matched
    // *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-   if (myElectrons.begin()->triggerObjectMatchesByPath(hltpath_).size()==0)
-     return false; // RETURN highest ET electron is not trigger matched
+   bool triggerMatch=false;
+   for (std::vector<std::string>::const_iterator hltpath=hltpath_.begin();hltpath!=hltpath_.end();++hltpath)
+     if (myElectrons.begin()->triggerObjectMatchesByPath(*hltpath).size()>0)
+       triggerMatch=true; // RETURN highest ET electron is not trigger matched
+   if (!triggerMatch)
+     return false;
 
    // *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
    // Add some user informations to electrons. Mostly to show functionality... 
@@ -272,8 +281,9 @@ ElectronCandidateFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetu
 	 iEle->addUserInt("NumberOfExpectedMissingHits",numberOfInnerHits);
 
 	 float matched_dr_distance=-1;
-	 if (myElectrons.begin()->triggerObjectMatchByPath(hltpath_))
-	   matched_dr_distance=deltaR((*iEle),(*(myElectrons.begin()->triggerObjectMatchByPath(hltpath_))));
+	 for (std::vector<std::string>::const_iterator hltpath=hltpath_.begin();hltpath!=hltpath_.end();++hltpath)
+	   if (myElectrons.begin()->triggerObjectMatchByPath(*hltpath))
+	     matched_dr_distance=deltaR((*iEle),(*(myElectrons.begin()->triggerObjectMatchByPath(*hltpath))));
 	 iEle->addUserFloat("HLTMatchingDR", matched_dr_distance);
        }
 

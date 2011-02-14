@@ -115,7 +115,7 @@ process.electronPATFilter = cms.EDFilter(
     ### the input collections needed:
     electronCollection = cms.untracked.InputTag("selectedPatElectronsTriggerMatch","","PAT"),
     triggerEvent = cms.untracked.InputTag("patTriggerEvent","","PAT"),
-    hltpath = cms.untracked.string("HLT_Ele17_SW_TighterEleIdIsol_L1R_v3"), 
+    hltpath = cms.untracked.vstring("HLT_Ele17_SW_TighterEleIdIsol_L1R_v3"), 
     ebRecHits = cms.untracked.InputTag("reducedEcalRecHitsEB"),
     eeRecHits = cms.untracked.InputTag("reducedEcalRecHitsEE"),
     ### here the preselection is applied
