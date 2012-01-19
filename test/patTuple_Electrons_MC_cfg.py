@@ -102,8 +102,8 @@ switchOnTriggerMatchEmbedding(
  )
 
 # Select jets
-process.selectedPatJets.cut = cms.string('pt > 10')
-process.selectedPatJetsAK5PF.cut = cms.string('pt > 10')
+process.selectedPatJets.cut = cms.string('pt > 30')
+process.selectedPatJetsAK5PF.cut = cms.string('pt > 30')
 
 # Add the files
 readFiles = cms.untracked.vstring()

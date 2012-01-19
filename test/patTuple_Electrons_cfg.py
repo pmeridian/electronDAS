@@ -99,8 +99,8 @@ switchOnTriggerMatchEmbedding(
  )
 
 # Select jets
-process.selectedPatJets.cut = cms.string('pt > 10')
-process.selectedPatJetsAK5PF.cut = cms.string('pt > 10')
+process.selectedPatJets.cut = cms.string('pt > 30')
+process.selectedPatJetsAK5PF.cut = cms.string('pt > 30')
 
 # Add the files
 readFiles = cms.untracked.vstring()
@@ -234,7 +234,7 @@ process.out.SelectEvents = cms.untracked.PSet(
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1000)
 
 # process all the events
-process.maxEvents.input = 20
+process.maxEvents.input = 500
 process.options.wantSummary = True
 
 
