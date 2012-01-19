@@ -64,7 +64,7 @@ def main():
         
     prefixFnal = 'dcache:/pnfs/cms/WAX/11/store/user/meridian/electronDAS'
     prefixCern = 'rfio:/castor/cern.ch/user/m/meridian/electronDAS'
-    prefixLocal = '/cmsrm/pc24_2/meridian'
+    prefixLocal = './'
 
     prefix = prefixLocal
 
@@ -76,17 +76,17 @@ def main():
     # PAT ntuples with electronCollection
     files = [
         # DATA Run 148862-148864  
-        "/Electron22DecPAT_v2/electronsPATTuple_10_1_WKk.root",
-        "/Electron22DecPAT_v2/electronsPATTuple_11_1_Adi.root",
-        "/Electron22DecPAT_v2/electronsPATTuple_1_1_dxA.root",
-        "/Electron22DecPAT_v2/electronsPATTuple_2_1_xPq.root",
-        "/Electron22DecPAT_v2/electronsPATTuple_3_2_rFq.root",
-        "/Electron22DecPAT_v2/electronsPATTuple_4_1_7JY.root",
-        "/Electron22DecPAT_v2/electronsPATTuple_5_1_c5t.root",
-        "/Electron22DecPAT_v2/electronsPATTuple_6_1_3Rb.root",
-        "/Electron22DecPAT_v2/electronsPATTuple_7_1_1no.root",
-        "/Electron22DecPAT_v2/electronsPATTuple_8_1_gSK.root",
-        "/Electron22DecPAT_v2/electronsPATTuple_9_1_j0U.root",
+#        "/Electron22DecPAT_v2/electronsPATTuple_10_1_WKk.root",
+#        "/Electron22DecPAT_v2/electronsPATTuple_11_1_Adi.root",
+#        "/Electron22DecPAT_v2/electronsPATTuple_1_1_dxA.root",
+#        "/Electron22DecPAT_v2/electronsPATTuple_2_1_xPq.root",
+#        "/Electron22DecPAT_v2/electronsPATTuple_3_2_rFq.root",
+#        "/Electron22DecPAT_v2/electronsPATTuple_4_1_7JY.root",
+#        "/Electron22DecPAT_v2/electronsPATTuple_5_1_c5t.root",
+#        "/Electron22DecPAT_v2/electronsPATTuple_6_1_3Rb.root",
+#        "/Electron22DecPAT_v2/electronsPATTuple_7_1_1no.root",
+#        "/Electron22DecPAT_v2/electronsPATTuple_8_1_gSK.root",
+#        "/Electron22DecPAT_v2/electronsPATTuple_9_1_j0U.root",
     
 #        MC WEnu files 
 #        "/WToENu_TuneZ2_7TeV-pythia6_v1/electronsPATTuple_10_1_Ldq.root",
@@ -102,6 +102,7 @@ def main():
 #        "/DYToEE_M-20_TuneZ2_7TeV-pythia6_v1/electronsPATTuple_17_1_7Yk.root",
 #        "/DYToEE_M-20_TuneZ2_7TeV-pythia6_v1/electronsPATTuple_18_1_m9E.root",
 
+        "electronsPATTuple.root"
         ]
     
     fullpath_files = []
@@ -113,7 +114,7 @@ def main():
     for ifile in fullpath_files:
             print ifile
             
-    events = Events ( fullpath_files )
+    events = Events ( fullpath_files  )
 
     handleElectron = Handle ("vector<pat::Electron>")
     handleMET = Handle ("vector<pat::MET>")
@@ -167,15 +168,16 @@ def main():
     # loop over events
     i = 0 # event counter
 
+    print events.size()
     for event in events:
-        i = i + 1
+        i= i + 1
         if i%1000 == 0:
             printInfo(i,event)
-
+            
         # check if maximum number of events was asked
-        if maxNevents > 0 and maxNevents == i:
-           print "Maximum number of events read "+str(maxNevents) 
-           break
+#        if maxNevents > 0 and maxNevents == i:
+#           print "Maximum number of events read "+str(maxNevents) 
+#           break
         
         event.getByLabel (electronCollection, electronCollectionInstance, handleElectron)
         electrons = handleElectron.product()
