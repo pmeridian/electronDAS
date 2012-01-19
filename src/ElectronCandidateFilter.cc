@@ -35,7 +35,7 @@
 
 //
 #include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
-#include "RecoLocalCalo/EcalRecAlgos/interface/EcalSeverityLevelAlgo.h"
+//#include "RecoLocalCalo/EcalRecAlgos/interface/EcalSeverityLevelAlgo.h"
 #include "CondFormats/DataRecord/interface/EcalChannelStatusRcd.h"
 
 //
@@ -228,12 +228,12 @@ ElectronCandidateFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetu
 	 const EcalRecHitCollection *myRecHits = recHits.product();     
 	 const DetId seedId = iEle->superCluster()->seed()->seed();
 	
-	 EcalSeverityLevelAlgo severity;
-	 Double_t swissCross = severity.swissCross(seedId, *myRecHits);
-	 if (swissCross > spikeCleaningSwissCrossCut_) {
-	   //removing spikes from electron collection
-	   myElectrons.erase((iEle+1).base());
-	 }
+// 	 EcalSeverityLevelAlgo severity;
+// 	 Double_t swissCross = severity.swissCross(seedId, *myRecHits);
+// 	 if (swissCross > spikeCleaningSwissCrossCut_) {
+// 	   //removing spikes from electron collection
+// 	   myElectrons.erase((iEle+1).base());
+// 	 }
        }
    }
 

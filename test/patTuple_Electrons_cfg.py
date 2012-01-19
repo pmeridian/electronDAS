@@ -7,7 +7,7 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 from PhysicsTools.PatAlgos.tools.coreTools import *
 
 ## global tag for data
-process.GlobalTag.globaltag = cms.string('GR_R_39X_V5::All') 
+process.GlobalTag.globaltag = cms.string('GR_R_42_V23::All') 
 
 # add pf met
 from PhysicsTools.PatAlgos.tools.metTools import *
