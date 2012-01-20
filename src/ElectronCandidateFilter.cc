@@ -67,8 +67,8 @@ private:
 
   Double_t ETCut_;
 
-  edm::InputTag triggerEvent_;
-  std::vector<std::string> hltpath_;
+//   edm::InputTag triggerEvent_;
+//   std::vector<std::string> hltpath_;
 
   edm::InputTag electronCollection_;
 
@@ -80,9 +80,6 @@ private:
   Double_t EndCapMinEta_;
 
   Bool_t useEcalDrivenElectrons_;
-  Bool_t useSpikeRejection_;
-  Double_t spikeCleaningSwissCrossCut_;
-
 
 };
 #endif
@@ -107,20 +104,14 @@ ElectronCandidateFilter::ElectronCandidateFilter(const edm::ParameterSet& iConfi
   BarrelMaxEta_ = iConfig.getUntrackedParameter<double>("BarrelMaxEta", BarrelMaxEta_D);
   EndCapMaxEta_ = iConfig.getUntrackedParameter<double>("EndCapMaxEta", EndCapMaxEta_D);
   EndCapMinEta_ = iConfig.getUntrackedParameter<double>("EndCapMinEta", EndCapMinEta_D);
-  // trigger related
-  triggerEvent_=iConfig.getUntrackedParameter<edm::InputTag>("triggerEvent");
-  hltpath_=iConfig.getUntrackedParameter<std::vector<std::string> >("hltpath");
+//   // trigger related
+//   triggerEvent_=iConfig.getUntrackedParameter<edm::InputTag>("triggerEvent");
+//   hltpath_=iConfig.getUntrackedParameter<std::vector<std::string> >("hltpath");
 
   electronCollection_=iConfig.getUntrackedParameter<edm::InputTag>("electronCollection");
   //
   ebRecHits_ =  iConfig.getUntrackedParameter<edm::InputTag>("ebRecHits");
   eeRecHits_ =  iConfig.getUntrackedParameter<edm::InputTag>("eeRecHits");
-
-  // spike cleaning:
-  useSpikeRejection_ = iConfig.getUntrackedParameter<Bool_t>("useSpikeRejection");
-  if (useSpikeRejection_) {
-    spikeCleaningSwissCrossCut_= iConfig.getUntrackedParameter<Double_t>("spikeCleaningSwissCrossCut");
-  }
 
   // now print a summary with what exactly the filter does:
   std::cout << "ElectronCandidateFilter..." << std::endl;
@@ -132,10 +123,10 @@ ElectronCandidateFilter::ElectronCandidateFilter(const edm::ParameterSet& iConfi
 	      << " be ecal driven" << std::endl;
   }
 
-  if (useSpikeRejection_) {
-    std::cout << "ElectronCandidateFilter: Spike Cleaning will be done with the Swiss Cross Criterion"
-	      << " cutting at " << spikeCleaningSwissCrossCut_ << std::endl;
-  }
+//   if (useSpikeRejection_) {
+//     std::cout << "ElectronCandidateFilter: Spike Cleaning will be done with the Swiss Cross Criterion"
+// 	      << " cutting at " << spikeCleaningSwissCrossCut_ << std::endl;
+//   }
 
   std::cout << "ElectronCandidateFilter: Fiducial Cut: " << std::endl;
   std::cout << "ElectronCandidateFilter:    BarrelMax: "<<BarrelMaxEta_<<std::endl;
@@ -170,24 +161,6 @@ ElectronCandidateFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetu
 
 
    // *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-   // TRIGGER REQUIREMENT 
-   // *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-   // the event should pass an electron trigger
-
-   edm::Handle< pat::TriggerEvent > triggerEvent;
-   iEvent.getByLabel( triggerEvent_, triggerEvent );
-
-   // ask for trigger accept; otherwise we don't even start
-   bool trigger=false;
-   for (std::vector<std::string>::const_iterator hltpath=hltpath_.begin();hltpath!=hltpath_.end();++hltpath)
-     if((triggerEvent->path(*hltpath)))
-	if((triggerEvent->path(*hltpath)->wasRun() && triggerEvent->path(*hltpath)->wasAccept())){
-	  trigger=true;
-	}
-   if (!trigger)
-     return false;
-
-   // *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
    // Electron collection
    // *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
    edm::Handle<pat::ElectronCollection> patElectron;
@@ -197,7 +170,7 @@ ElectronCandidateFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetu
    pat::ElectronCollection::const_iterator elec;
    // check how many electrons there are in the event
    if (   pElecs->size() == 0) {
-     //std::cout << "No electrons found in this event" << std::endl;
+     std::cout << "No electrons found in this event" << std::endl;
      return false; // RETURN if no elecs in the event
    }
 
@@ -207,35 +180,6 @@ ElectronCandidateFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetu
    std::copy(pElecs->begin(),pElecs->end(),myElectrons.begin());
    std::sort(myElectrons.begin(), myElectrons.end(), scEtComparator_);
 
-   
-   // *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-   // spike rejection only in EB. Already done in 39X but can be useful for other checks
-   // for example on timing of central rechit or adding removal of double spikes (spikes contamination
-   // is normally low for electrons due to track matching requirements)
-   // *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
-   if (useSpikeRejection_)  {
-
-     edm::Handle<EcalRecHitCollection> recHits;
-     iEvent.getByLabel(ebRecHits_, recHits);
-
-
-     for (pat::ElectronCollection::reverse_iterator iEle=myElectrons.rbegin();iEle!=myElectrons.rend();++iEle)
-       {
-	 if (!iEle->isEB())
-	   continue;
-
-	 const EcalRecHitCollection *myRecHits = recHits.product();     
-	 const DetId seedId = iEle->superCluster()->seed()->seed();
-	
-// 	 EcalSeverityLevelAlgo severity;
-// 	 Double_t swissCross = severity.swissCross(seedId, *myRecHits);
-// 	 if (swissCross > spikeCleaningSwissCrossCut_) {
-// 	   //removing spikes from electron collection
-// 	   myElectrons.erase((iEle+1).base());
-// 	 }
-       }
-   }
 
    // *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
    // ET CUT: at least one electron in the event with ET>ETCut_-*-*-*-*-*
@@ -259,15 +203,7 @@ ElectronCandidateFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetu
      }
    }
 
-   // *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-   // Demand also that leading electron is trigger matched
-   // *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-   bool triggerMatch=false;
-   for (std::vector<std::string>::const_iterator hltpath=hltpath_.begin();hltpath!=hltpath_.end();++hltpath)
-     if (myElectrons.begin()->triggerObjectMatchesByPath(*hltpath).size()>0)
-       triggerMatch=true; // RETURN highest ET electron is not trigger matched
-   if (!triggerMatch)
-     return false;
+
 
    // *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
    // Add some user informations to electrons. Mostly to show functionality... 
@@ -280,11 +216,11 @@ ElectronCandidateFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetu
 	 int numberOfInnerHits = (int) iEle->gsfTrack()->trackerExpectedHitsInner().numberOfHits();
 	 iEle->addUserInt("NumberOfExpectedMissingHits",numberOfInnerHits);
 
-	 float matched_dr_distance=-1;
-	 for (std::vector<std::string>::const_iterator hltpath=hltpath_.begin();hltpath!=hltpath_.end();++hltpath)
-	   if (myElectrons.begin()->triggerObjectMatchByPath(*hltpath))
-	     matched_dr_distance=deltaR((*iEle),(*(myElectrons.begin()->triggerObjectMatchByPath(*hltpath))));
-	 iEle->addUserFloat("HLTMatchingDR", matched_dr_distance);
+// 	 float matched_dr_distance=-1;
+// 	 for (std::vector<std::string>::const_iterator hltpath=hltpath_.begin();hltpath!=hltpath_.end();++hltpath)
+// 	   if (myElectrons.begin()->triggerObjectMatchByPath(*hltpath))
+// 	     matched_dr_distance=deltaR((*iEle),(*(myElectrons.begin()->triggerObjectMatchByPath(*hltpath))));
+// 	 iEle->addUserFloat("HLTMatchingDR", matched_dr_distance);
        }
 
   

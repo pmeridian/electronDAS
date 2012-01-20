@@ -174,7 +174,7 @@ process.out.SelectEvents = cms.untracked.PSet(
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1000)
 
 # process all the events
-process.maxEvents.input = 20
+process.maxEvents.input = 10000
 process.options.wantSummary = True
 
 
