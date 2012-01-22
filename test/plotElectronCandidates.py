@@ -63,55 +63,55 @@ def main():
     rhoCollectionInstance = "rho"
     
     #change this according to your needs
-    outfilename = "electronDistributionsDATA.root"
+    outfilename = "electronDistributionsMC.root"
     outputroot = TFile( outfilename, "RECREATE")
         
-    prefixFnal = 'dcache:/pnfs/cms/WAX/11/store/user/meridian/electronDAS/'
-    prefixCern = 'rfio:/castor/cern.ch/user/m/meridian/electronDAS/'
+#    prefixFnal = 'dcache:/pnfs/cms/WAX/11/store/user/meridian/electronDAS/'
+#    prefixCern = 'rfio:/castor/cern.ch/user/m/meridian/electronDAS/'
     prefixPisa = '/gpfs/gpfsddn/srm/cms/store/user/cmsdas/2012/ElectronShortExercise/'
     prefixLocal = './'
 
     prefix = prefixPisa
 
     # Kinamatic cuts used in the analysis
-    ptCut = 25.
+    ptCut = 20.
 #    metCut = 20.
 #    mtCut = 40.
 
     # PAT ntuples with electronCollection
     files = [
         # DATA
-        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_153_1_af3.root",
-        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_98_1_wVK.root",
-        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_62_1_ZUG.root",
-        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_97_1_TTG.root",
-        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_87_1_f4r.root",
-        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_57_1_xAL.root",
-        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_49_1_OPG.root",
-        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_95_1_G3u.root",
-        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_91_1_zVW.root",
-        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_61_1_Pyp.root",
-        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_86_1_LrO.root",
-        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_90_1_d6O.root",
-        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_94_1_LXl.root",
-        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_53_1_3jO.root",
-        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_88_1_hLL.root",
-        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_84_1_EQI.root",
-        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_48_1_A1Y.root",
-        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_5_1_0RS.root",
-        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_68_1_j8Z.root",
+#        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_153_1_af3.root",
+#        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_98_1_wVK.root",
+#        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_62_1_ZUG.root",
+#        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_97_1_TTG.root",
+#        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_87_1_f4r.root",
+#        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_57_1_xAL.root",
+#        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_49_1_OPG.root",
+#        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_95_1_G3u.root",
+#        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_91_1_zVW.root",
+#        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_61_1_Pyp.root",
+#        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_86_1_LrO.root",
+#        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_90_1_d6O.root",
+#        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_94_1_LXl.root",
+#        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_53_1_3jO.root",
+#        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_88_1_hLL.root",
+#        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_84_1_EQI.root",
+#        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_48_1_A1Y.root",
+#        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_5_1_0RS.root",
+#        "DATA/DoubleElectron-Run2011B-ZElectronSkimOnTheFly-30Nov2011-v2/electronsPATTuple_68_1_j8Z.root",
 #    
 #       MC DY files
-#       "MC/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/Fall11-PU_S6_START42_V14B-v1/electronsPATTuple_10_1_HJi.root",
-#       "MC/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/Fall11-PU_S6_START42_V14B-v1/electronsPATTuple_1_1_ZaP.root",
-#       "MC/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/Fall11-PU_S6_START42_V14B-v1/electronsPATTuple_2_1_UJp.root",
-#       "MC/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/Fall11-PU_S6_START42_V14B-v1/electronsPATTuple_3_1_0e6.root",
-#       "MC/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/Fall11-PU_S6_START42_V14B-v1/electronsPATTuple_4_1_6M3.root",
-#       "MC/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/Fall11-PU_S6_START42_V14B-v1/electronsPATTuple_5_1_Zzn.root",
-#       "MC/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/Fall11-PU_S6_START42_V14B-v1/electronsPATTuple_6_1_VwQ.root",
-#       "MC/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/Fall11-PU_S6_START42_V14B-v1/electronsPATTuple_7_1_54n.root",
-#       "MC/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/Fall11-PU_S6_START42_V14B-v1/electronsPATTuple_8_2_pzv.root",
-#       "MC/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/Fall11-PU_S6_START42_V14B-v1/electronsPATTuple_9_1_jHf.root",
+       "MC/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/Fall11-PU_S6_START42_V14B-v1/electronsPATTuple_10_1_HJi.root",
+       "MC/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/Fall11-PU_S6_START42_V14B-v1/electronsPATTuple_1_1_ZaP.root",
+       "MC/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/Fall11-PU_S6_START42_V14B-v1/electronsPATTuple_2_1_UJp.root",
+       "MC/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/Fall11-PU_S6_START42_V14B-v1/electronsPATTuple_3_1_0e6.root",
+       "MC/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/Fall11-PU_S6_START42_V14B-v1/electronsPATTuple_4_1_6M3.root",
+       "MC/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/Fall11-PU_S6_START42_V14B-v1/electronsPATTuple_5_1_Zzn.root",
+       "MC/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/Fall11-PU_S6_START42_V14B-v1/electronsPATTuple_6_1_VwQ.root",
+       "MC/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/Fall11-PU_S6_START42_V14B-v1/electronsPATTuple_7_1_54n.root",
+       "MC/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/Fall11-PU_S6_START42_V14B-v1/electronsPATTuple_8_2_pzv.root",
+       "MC/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/Fall11-PU_S6_START42_V14B-v1/electronsPATTuple_9_1_jHf.root",
     
         ]
     
@@ -131,7 +131,7 @@ def main():
     handleRho = Handle ("double")
 #    handleMET = Handle ("vector<pat::MET>")
 
-    electronIdLevels= [ "","simpleEleId95cIso","simpleEleId80cIso","simpleEleId70cIso" ]
+    electronIdLevels= [ "","simpleEleId90cIso","simpleEleId80cIso","simpleEleId70cIso" ]
 
     # ****************************************************************
     # Booking histograms
@@ -166,6 +166,16 @@ def main():
             histogram["ele_EE_HOverE"+ id] = TH1F("ele_EE_HOverE"+id,"H/E (EE)", 100, 0., 0.15)
             histogram["ele_EE_CombinedIso"+ id] = TH1F("ele_EE_CombinedIso"+id,"CombinedIso (EE)", 100, 0., 0.15)
             histogram["ele_EE_ExpMissHits"+ id] = TH1F("ele_EE_ExpMissHits"+id,"Exp Miss. Hits (EE)", 10, -0.5, 9.5)
+
+            #Bkg enriched distributions
+            histogram["ele_EB_sigmaIetaIetaBg_"+ id] = TH1F("ele_EB_sigmaIetaIetaBg_"+id,"#sigma_{i#etai#eta} (EB)", 100, 0., 0.03)
+            histogram["ele_EB_HOverEBg_"+ id] = TH1F("ele_EB_HOverEBg_"+id,"H/E (EB)", 100, 0., 0.15)
+            histogram["ele_EB_CombinedIsoBg_"+ id] = TH1F("ele_EB_CombinedIsoBg_"+id,"CombinedIso (EB)", 100, 0., 0.15)
+            histogram["ele_EB_ExpMissHitsBg_"+ id] = TH1F("ele_EB_ExpMissHitsBg_"+id,"Exp Miss. Hits (EB)", 10, -0.5, 9.5)
+            histogram["ele_EE_sigmaIetaIetaBg_"+ id] = TH1F("ele_EE_sigmaIetaIetaBg_"+id,"#sigma_{i#etai#eta} (EE)", 100, 0.015, 0.05)
+            histogram["ele_EE_HOverEBg_"+ id] = TH1F("ele_EE_HOverEBg_"+id,"H/E (EE)", 100, 0., 0.15)
+            histogram["ele_EE_CombinedIsoBg_"+ id] = TH1F("ele_EE_CombinedIsoBg_"+id,"CombinedIso (EE)", 100, 0., 0.15)
+            histogram["ele_EE_ExpMissHitsBg_"+ id] = TH1F("ele_EE_ExpMissHitsBg_"+id,"Exp Miss. Hits (EE)", 10, -0.5, 9.5)
 
         # Some N-1 plots for EB and EE
         if id != "": # not booking them when no selection is applied
@@ -312,7 +322,7 @@ def main():
 
                     tkIso = electrons[iele].dr03TkSumPt()
                     ecalIsoPed = (max([0.,electrons[iele].dr04EcalRecHitSumEt()-1.]) if electrons[iele].isEB() else electrons[iele].dr04EcalRecHitSumEt())
-                    hcalIso = electrons[iele].dr04HcalTowerSumEt()
+                    hcalIso = elecAtrons[iele].dr04HcalTowerSumEt()
 
                     if (electrons[iele].isEB()):
                         histogram["ele_EB_CombinedIsoProbe_"+ id].Fill( (tkIso+ecalIsoPed+hcalIso)/electrons[iele].pt() )
@@ -348,6 +358,7 @@ def main():
 
                     if (vZ.Mag()<60. or vZ.Mag()>120.):
                         continue
+
                     histogram["mee60_" + id].Fill( vZ.Mag() )
 
                     for iele in range(0,1):
