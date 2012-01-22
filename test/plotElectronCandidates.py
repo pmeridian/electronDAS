@@ -141,7 +141,7 @@ def main():
 
 
     for id in electronIdLevels:
-        # general electron kinematics carachteristics
+        # general  kinematics carachteristics at various level of ID requirements
         histogram["nVertices_" + id] = TH1F("nVertices_" + id, "nVertices", 50, -0.5, 49.5)
         histogram["rho_" + id ] = TH1F("rho_" + id, "rho", 200, 0., 50.)
         histogram["ele_pt_" + id] = TH1F("ele_pt_"+id,"Ele p_{T} [GeV/c]", 50, 0, 150)
@@ -149,7 +149,7 @@ def main():
         histogram["ele_eta_" + id] = TH1F("ele_eta_"+id,"ele #eta", 50, -2.5, 2.5)
         histogram["ele_phi_"+ id] = TH1F("ele_phi_"+id,"ele #phi", 50, -math.pi, math.pi)
 
-        # Z candidates mass plots
+        # Z candidates mass plots general at various level of ID requirements
 #        histogram["met_"+ id] = TH1F("met_"+id,"MET [GeV/c]", 50, 0. , 100.)
 #        histogram["mt_"+ id] = TH1F("mt_"+id,"Transverse Mass [GeV/c^{2}]", 50, 0. , 200.)
         histogram["mee_"+ id] = TH1F("mee_"+id,"Invariant Mass [GeV/c^{2}]", 240, 30. , 150.)
@@ -169,12 +169,21 @@ def main():
 
         # Some N-1 plots for EB and EE
         if id != "": # not booking them when no selection is applied
+
+            # Mass plots for Tag&Probe 
             histogram["meetp_"+ id] = TH1F("meetp_"+id,"Invariant Mass [GeV/c^{2}]", 240, 30. , 150.)
+            histogram["mee_EB_tp_"+ id] = TH1F("mee_EB_tp_"+id,"Invariant Mass [GeV/c^{2}]", 240, 30. , 150.)
+            histogram["mee_EE_tp_"+ id] = TH1F("mee_EE_tp_"+id,"Invariant Mass [GeV/c^{2}]", 240, 30. , 150.)
             for id1 in electronIdLevels:
                 if id1 != "": # not booking them when no selection is applied
-                    histogram["meetp_pass_t"+ id+"_p"+ id1] = TH1F("meetp_pass_t"+ id+"_p"+ id1,"Invariant Mass Pass [GeV/c^{2}]", 240, 30. , 150.)
-                    histogram["meetp_fail_t"+ id+"_p"+ id1] = TH1F("meetp_fail_t"+ id+"_p"+ id1,"Invariant Mass Pass [GeV/c^{2}]", 240, 30. , 150.)
+                    histogram["meetp_pass_t"+ id +"_p"+ id1] = TH1F("meetp_pass_t"+ id+"_p"+ id1,"Invariant Mass Pass [GeV/c^{2}]", 240, 30. , 150.)
+                    histogram["meetp_fail_t"+ id +"_p"+ id1] = TH1F("meetp_fail_t"+ id+"_p"+ id1,"Invariant Mass Pass [GeV/c^{2}]", 240, 30. , 150.)
+                    histogram["mee_EB_tp_pass_t"+ id+"_p"+ id1] = TH1F("mee_EB_tp_pass_t"+ id+"_p"+ id1,"Invariant Mass Pass [GeV/c^{2}]", 240, 30. , 150.)
+                    histogram["mee_EB_tp_fail_t"+ id+"_p"+ id1] = TH1F("mee_EB_tp_fail_t"+ id+"_p"+ id1,"Invariant Mass Pass [GeV/c^{2}]", 240, 30. , 150.)
+                    histogram["mee_EE_tp_pass_t"+ id+"_p"+ id1] = TH1F("mee_EE_tp_pass_t"+ id+"_p"+ id1,"Invariant Mass Pass [GeV/c^{2}]", 240, 30. , 150.)
+                    histogram["mee_EE_tp_fail_t"+ id+"_p"+ id1] = TH1F("mee_EE_tp_fail_t"+ id+"_p"+ id1,"Invariant Mass Pass [GeV/c^{2}]", 240, 30. , 150.)
 
+            # Probe ID variables plots
             histogram["ele_EB_sigmaIetaIetaProbe_"+ id] = TH1F("ele_EB_sigmaIetaIetaProbe_"+id,"#sigma_{i#etai#eta} (EB)", 100, 0., 0.03)
             histogram["ele_EB_HOverEProbe_"+ id] = TH1F("ele_EB_HOverEProbe_"+id,"H/E (EB)", 100, 0., 0.15)
             histogram["ele_EB_CombinedIsoProbe_"+ id] = TH1F("ele_EB_CombinedIsoProbe_"+id,"CombinedIso (EB)", 100, 0., 0.15)
@@ -184,6 +193,7 @@ def main():
             histogram["ele_EE_CombinedIsoProbe_"+ id] = TH1F("ele_EE_CombinedIsoProbe_"+id,"CombinedIso (EE)", 100, 0., 0.15)
             histogram["ele_EE_ExpMissHitsProbe_"+ id] = TH1F("ele_EE_ExpMissHitsProbe_"+id,"Exp Miss. Hits (EE)", 10, -0.5, 9.5)
 
+            # N-1 ID variables plots
             histogram["ele_EB_sigmaIetaIetaNMinusOne_"+ id] = TH1F("ele_EB_sigmaIetaIetaNMinusOne_"+id,"#sigma_{i#etai#eta} (EB)", 100, 0., 0.03)
             histogram["ele_EB_HOverENMinusOne_"+ id] = TH1F("ele_EB_HOverENMinusOne_"+id,"H/E (EB)", 100, 0., 0.15)
             histogram["ele_EB_CombinedIsoNMinusOne_"+ id] = TH1F("ele_EB_CombinedIsoNMinusOne_"+id,"CombinedIso (EB)", 100, 0., 0.15)
@@ -279,18 +289,27 @@ def main():
                 v1.SetPtEtaPhiM(elePt1,electrons[0].eta(),electrons[0].phi(),0.)
                 v2.SetPtEtaPhiM(elePt2,electrons[1].eta(),electrons[1].phi(),0.)
                 vZ=v1+v2
-                # rudimentary t&p selection for different tag selection
+                
+                # ************************************************************************************************************************************************************************************************
+                # Rudimentary tag & probe selection for different tag selection. Probe here is a gsfElectron satistying the ptCut. Arbitration of the tag is done using a random number.
+                # It will be useful only to study the ID cut efficiencies
+                # ************************************************************************************************************************************************************************************************
                 tagIsE1 = rand.Uniform()
                 if ( (id != "") and ( ( (tagIsE1 <0.5) and checkFullElectronId(electrons[0],id) ) or ( (tagIsE1 >0.5) and checkFullElectronId(electrons[1],id) ) ) ): 
                     if (vZ.Mag()<60. or vZ.Mag()>120.):
                         continue
 
                     histogram["meetp_" + id].Fill( vZ.Mag() )
-                    
+
                     iele=1
                     if ( tagIsE1> 0.5):
                         iele=0
-                        
+
+                    if (electrons[iele].isEB()):
+                        histogram["mee_EB_tp_" + id].Fill( vZ.Mag() )
+                    else:
+                        histogram["mee_EE_tp_" + id].Fill( vZ.Mag() )
+
                     tkIso = electrons[iele].dr03TkSumPt()
                     ecalIsoPed = (max([0.,electrons[iele].dr04EcalRecHitSumEt()-1.]) if electrons[iele].isEB() else electrons[iele].dr04EcalRecHitSumEt())
                     hcalIso = electrons[iele].dr04HcalTowerSumEt()
@@ -311,9 +330,17 @@ def main():
                             continue
                         if (checkFullElectronId(electrons[iele],id1)):
                             histogram["meetp_pass_t" + id+"_p" + id1].Fill( vZ.Mag() )
+                            if (electrons[iele].isEB()):
+                                histogram["mee_EB_tp_pass_t" + id+"_p" + id1].Fill( vZ.Mag() )
+                            else:
+                                histogram["mee_EE_tp_pass_t" + id+"_p" + id1].Fill( vZ.Mag() )
                         else:
                             histogram["meetp_fail_t" + id+"_p" + id1].Fill( vZ.Mag() )
-
+                            if (electrons[iele].isEB()):
+                                histogram["mee_EB_tp_fail_t" + id+"_p" + id1].Fill( vZ.Mag() )
+                            else:
+                                histogram["mee_EE_tp_fail_t" + id+"_p" + id1].Fill( vZ.Mag() )
+                                
                 if (checkFullElectronId(electrons[0],id) and checkFullElectronId(electrons[1],id) ): # checking id for both electrons
                     histogram["mee_" + id].Fill( vZ.Mag() )
                     histogram["nVertices_" + id ].Fill( Nvertices )
